@@ -2,17 +2,17 @@ use serde_json::Value;
 
 #[derive(Debug, Default, Clone)]
 pub struct LocationInfo {
-    city: String,
-    county: String,
-    state: String,
-    country_code: String,
-    postal_code: String,
-    is_open: bool,
-    address: String,
-    id: String,
-    category: String,
-    name: String,
-    website_uri: String,
+    pub city: String,
+    pub county: String,
+    pub state: String,
+    pub country_code: String,
+    pub postal_code: String,
+    pub is_open: bool,
+    pub address: String,
+    pub id: String,
+    pub category: String,
+    pub name: String,
+    pub website_uri: String,
 }
 
 #[derive(Debug)]
