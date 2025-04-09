@@ -64,7 +64,6 @@ static EXCLUDE_CATEGORIES: Lazy<HashSet<String>> = Lazy::new(|| {
 });
 
 pub fn parse_data(value: &Value) -> Option<ParsedLocationData> {
-    println!("{:#?}", value);
     let parsed_location_data: Option<Vec<LocationInfo>> = match &value["places"] {
         Value::Array(v) => Some(v.iter().map(convert_val_obj_to_location_info).collect()),
         _ => None,
