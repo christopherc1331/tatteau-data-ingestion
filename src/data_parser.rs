@@ -22,6 +22,7 @@ pub struct LocationInfo {
 pub struct ParsedLocationData<'a> {
     pub location_info: Vec<LocationInfo>,
     pub next_token: Option<&'a str>,
+    pub filtered_count: usize,
 }
 
 fn convert_val_to_string(v: &Value) -> String {
@@ -68,12 +69,20 @@ pub fn parse_data(value: &Value) -> Option<ParsedLocationData> {
         Value::Array(v) => Some(v.iter().map(convert_val_obj_to_location_info).collect()),
         _ => None,
     };
+    let mut filtered_count = parsed_location_data.clone().unwrap_or_default().len();
 
-    parsed_location_data.map(|li| ParsedLocationData {
-        location_info: li
+    let filtered_location_data = parsed_location_data.map(|li| {
+        let location_info_vec: Vec<LocationInfo> = li
             .into_iter()
             .filter(|l| !EXCLUDE_CATEGORIES.contains(&l.category))
-            .collect(),
-        next_token: value["nextPageToken"].as_str(),
-    })
+            .collect();
+        filtered_count -= location_info_vec.len();
+        ParsedLocationData {
+            location_info: location_info_vec,
+            next_token: value["nextPageToken"].as_str(),
+            filtered_count,
+        }
+    });
+
+    filtered_location_data
 }

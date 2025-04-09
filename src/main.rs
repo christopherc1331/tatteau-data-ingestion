@@ -29,10 +29,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             let ParsedLocationData {
                 next_token,
                 location_info,
+                filtered_count,
             } = parsed_data;
             println!(
-                "Found {} results out of {}",
+                "Found {} and filtered {} results out of {}",
                 location_info.len(),
+                filtered_count,
                 limit_results_to
             );
 
