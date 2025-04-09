@@ -24,14 +24,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         max_iter -= 1;
 
         let res: Value = fetch_data(&location, limit_results_to, &current_token).await;
-        println!("BEFORE: {:#?}", res);
         let parsed_data_opt: Option<ParsedLocationData> = parse_data(&res);
         if let Some(parsed_data) = parsed_data_opt {
             let ParsedLocationData {
                 next_token,
                 location_info,
             } = parsed_data;
-            println!("AFTER: {:#?}", location_info);
             println!(
                 "Found {} results out of {}",
                 location_info.len(),

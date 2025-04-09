@@ -1,9 +1,10 @@
-use rusqlite::{Connection, Error};
+use rusqlite::{params, Connection, Error};
 
 use crate::data_parser::LocationInfo;
 
-pub fn upsert_locations(conn: &Connection, locations: &Vec<LocationInfo>) -> usize {
-    let mut sql: String = "INSERT OR REPLACE INTO locations (
+pub fn upsert_locations(conn: &Connection, locations: &[LocationInfo]) -> Result<(), Error> {
+    let mut stmt = conn.prepare_cached(
+        "INSERT OR REPLACE INTO locations (
                         city,
                         county,
                         state,
@@ -16,25 +17,11 @@ pub fn upsert_locations(conn: &Connection, locations: &Vec<LocationInfo>) -> usi
                         name,
                         website_uri
                     )
-                    VALUES ?"
-        .to_string();
+                    VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11)",
+    )?;
+    let t = conn.unchecked_transaction()?;
     locations.iter().for_each(|li| {
-        let inserted_cols = format!(
-            "
-                (
-                    {},
-                    {},
-                    {},
-                    {},
-                    {},
-                    {},
-                    {},
-                    {},
-                    {},
-                    {},
-                    {}
-                ),
-            ",
+        stmt.execute(params![
             li.city,
             li.county,
             li.state,
@@ -46,10 +33,8 @@ pub fn upsert_locations(conn: &Connection, locations: &Vec<LocationInfo>) -> usi
             li.category,
             li.name,
             li.website_uri
-        );
-        sql += &inserted_cols;
+        ])
+        .expect("query to execute");
     });
-
-    conn.execute(stringify!(sql), ())
-        .expect("Data to write to db")
+    t.commit()
 }
