@@ -1269,6 +1269,7 @@ name = "tatteau-data-ingestion"
 version = "0.1.0"
 dependencies = [
  "dotenv",
+ "once_cell",
  "reqwest",
  "rusqlite",
  "serde",

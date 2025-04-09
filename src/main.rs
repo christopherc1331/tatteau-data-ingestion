@@ -37,7 +37,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             );
 
             current_token = next_token.map(|s| s.to_string());
-            upsert_locations(&conn, &location_info);
+            let _ = upsert_locations(&conn, &location_info);
         }
 
         if current_token.is_none() {

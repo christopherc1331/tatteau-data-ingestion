@@ -1,3 +1,6 @@
+use std::collections::HashSet;
+
+use once_cell::sync::Lazy;
 use serde_json::Value;
 
 #[derive(Debug, Default, Clone)]
@@ -47,15 +50,31 @@ fn convert_val_obj_to_location_info(val: &Value) -> LocationInfo {
     }
 }
 
+static EXCLUDE_CATEGORIES: Lazy<HashSet<String>> = Lazy::new(|| {
+    HashSet::from([
+        "grocery_store".to_string(),
+        "beauty_salon".to_string(),
+        "bakery".to_string(),
+        "".to_string(),
+        "barber_shop".to_string(),
+        "restaurant".to_string(),
+        "sporting_goods_store".to_string(),
+        "wholesaler".to_string(),
+    ])
+});
+
 pub fn parse_data(value: &Value) -> Option<ParsedLocationData> {
     println!("{:#?}", value);
-    let location_info: Option<Vec<LocationInfo>> = match &value["places"] {
+    let parsed_location_data: Option<Vec<LocationInfo>> = match &value["places"] {
         Value::Array(v) => Some(v.iter().map(convert_val_obj_to_location_info).collect()),
         _ => None,
     };
 
-    location_info.map(|li| ParsedLocationData {
-        location_info: li,
+    parsed_location_data.map(|li| ParsedLocationData {
+        location_info: li
+            .into_iter()
+            .filter(|l| !EXCLUDE_CATEGORIES.contains(&l.category))
+            .collect(),
         next_token: value["nextPageToken"].as_str(),
     })
 }
